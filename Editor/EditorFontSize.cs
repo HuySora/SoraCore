@@ -76,58 +76,58 @@ namespace SoraCore.Editor
         private bool _dirtyCurrentPendingSave;
 
         // ---------------------- Startup ---------------------
-        [InitializeOnLoadMethod]
-        private static void ApplyPersistedOnLaunch()
-        {
-            if (!ApplyOnLaunch) return;
-
-            // Create invisible utility window; run _initCallback in its first OnGUI
-            var temp = CreateInstance<EditorFontSize>();
-            temp._initCallback = () =>
-            {
-                try
-                {
-                    temp.GrabProperties();
-
-                    // 1) Ensure defaults snapshot exists
-                    temp._defaultsMap = SnapshotFromJson(DefaultsPath);
-                    if (temp._defaultsMap.Count == 0)
-                    {
-                        temp._defaultsMap = temp.CaptureAllCurrentSizes();
-                        SaveSnapshot(temp._defaultsMap, DefaultsPath);
-                    }
-
-                    // 2) Load current (may be legacy full snapshot); ensure overrides-only
-                    var loadedCurrent = SnapshotFromJson(CurrentPath);
-                    Dictionary<string,int> overridesOnly = temp.ComputeOverrides(loadedCurrent, temp._defaultsMap);
-
-                    // 3) If file was missing, or it contained full map == defaults, start with empty overrides
-                    if (loadedCurrent.Count == 0 || overridesOnly.Count != loadedCurrent.Count)
-                    {
-                        SaveSnapshot(overridesOnly, CurrentPath); // migrate to overrides-only
-                    }
-                    temp._currentMap = overridesOnly;
-
-                    // 4) Apply global delta baseline
-                    var delta = EditorPrefs.GetInt(PrefKeyGlobalDelta, 0);
-                    if (delta != 0) temp.ApplyDeltaToAllStyles(delta);
-
-                    // 5) Apply overrides (absolute sizes for changed styles only)
-                    temp.ApplyOverrides(temp._currentMap);
-
-                    RepaintAll();
-                }
-                catch { /* non-fatal */ }
-                finally
-                {
-                    temp.Close();
-                }
-            };
-
-            temp.ShowUtility();
-            // Park off-screen and tiny so the window never flashes
-            temp.position = new Rect(-10000, -10000, 1, 1);
-        }
+        // [InitializeOnLoadMethod]
+        // private static void ApplyPersistedOnLaunch()
+        // {
+        //     if (!ApplyOnLaunch) return;
+        //
+        //     // Create invisible utility window; run _initCallback in its first OnGUI
+        //     var temp = CreateInstance<EditorFontSize>();
+        //     temp._initCallback = () =>
+        //     {
+        //         try
+        //         {
+        //             temp.GrabProperties();
+        //
+        //             // 1) Ensure defaults snapshot exists
+        //             temp._defaultsMap = SnapshotFromJson(DefaultsPath);
+        //             if (temp._defaultsMap.Count == 0)
+        //             {
+        //                 temp._defaultsMap = temp.CaptureAllCurrentSizes();
+        //                 SaveSnapshot(temp._defaultsMap, DefaultsPath);
+        //             }
+        //
+        //             // 2) Load current (may be legacy full snapshot); ensure overrides-only
+        //             var loadedCurrent = SnapshotFromJson(CurrentPath);
+        //             Dictionary<string,int> overridesOnly = temp.ComputeOverrides(loadedCurrent, temp._defaultsMap);
+        //
+        //             // 3) If file was missing, or it contained full map == defaults, start with empty overrides
+        //             if (loadedCurrent.Count == 0 || overridesOnly.Count != loadedCurrent.Count)
+        //             {
+        //                 SaveSnapshot(overridesOnly, CurrentPath); // migrate to overrides-only
+        //             }
+        //             temp._currentMap = overridesOnly;
+        //
+        //             // 4) Apply global delta baseline
+        //             var delta = EditorPrefs.GetInt(PrefKeyGlobalDelta, 0);
+        //             if (delta != 0) temp.ApplyDeltaToAllStyles(delta);
+        //
+        //             // 5) Apply overrides (absolute sizes for changed styles only)
+        //             temp.ApplyOverrides(temp._currentMap);
+        //
+        //             RepaintAll();
+        //         }
+        //         catch { /* non-fatal */ }
+        //         finally
+        //         {
+        //             temp.Close();
+        //         }
+        //     };
+        //
+        //     temp.ShowUtility();
+        //     // Park off-screen and tiny so the window never flashes
+        //     temp.position = new Rect(-10000, -10000, 1, 1);
+        // }
 
         
         // ---------------------- Menu ------------------------
